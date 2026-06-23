@@ -6,9 +6,11 @@ st.set_page_config(page_title="ITM - Assistant FL Pro", page_icon="🍏", layout
 
 
 # --- INITIALISATION INTELLIGENTE DU CATALOGUE ---
+
+# --- INITIALISATION INTELLIGENTE ET AUTOMATIQUE DU CATALOGUE ---
 if 'catalogue_fl' not in st.session_state:
     try:
-       # 1. On lit le fichier brut en texte pour ne rien perdre
+        # 1. On lit le fichier brut en texte pour ne rien perdre
         df_temp = pd.read_csv("cadencier.csv", sep=";", dtype=str)
         
         # Si jamais Excel a utilisé des virgules, on bascule dessus
@@ -35,7 +37,7 @@ if 'catalogue_fl' not in st.session_state:
             "VENTE_SEMAINE": "Vente_Semaine",
             "VENTE_SAMEDI": "Vente_Samedi",
             "VENTE_DIMANCHE": "Vente_Dimanche",
-            "VENTE_J": "Ventes_J",   # Corrige le "S" manquant
+            "VENTE_J": "Ventes_J",
             "VENTES_J": "Ventes_J",
             "CASSE_J": "Casse_J",
             "LIVRE_CE_MATIN": "Livre_Ce_Matin"
@@ -53,9 +55,8 @@ if 'catalogue_fl' not in st.session_state:
         st.session_state.catalogue_fl = df_temp
         
     except Exception as e:
-       st.error(f"⚠️ Erreur lors du chargement du cadencier : {e}")
+        st.error(f"⚠️ Erreur lors du chargement du cadencier : {e}")
         st.stop()
-
 df = st.session_state.catalogue_fl
 
 st.title("🍏 Mon Assistant FL")
