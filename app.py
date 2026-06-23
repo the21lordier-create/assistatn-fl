@@ -4,28 +4,11 @@ import math
 
 st.set_page_config(page_title="ITM - Assistant FL Pro", page_icon="🍏", layout="centered")
 
+
 # --- INITIALISATION DU CATALOGUE PRODUIT ---
 if 'catalogue_fl' not in st.session_state:
-    st.session_state.catalogue_fl = pd.DataFrame([
-        {
-            "PLU": "3001", "Produit": "Melon Charentais", "Unite": "Pièce", 
-            "Stock_Initial": 10, "PA_Brut": 1.20, "TVA": 0.055, "Marge": 35.0, "PV_Net": 2.05,
-            "Colisage": 10, "Stock_Securite": 5, "Vente_Semaine": 20, "Vente_Samedi": 45, "Vente_Dimanche": 15,
-            "Ventes_J": 0, "Casse_J": 0, "Livre_Ce_Matin": 0
-        },
-        {
-            "PLU": "3002", "Produit": "Tomate Grappe", "Unite": "Kg", 
-            "Stock_Initial": 15, "PA_Brut": 1.80, "TVA": 0.055, "Marge": 40.0, "PV_Net": 3.16,
-            "Colisage": 5, "Stock_Securite": 7, "Vente_Semaine": 15, "Vente_Samedi": 35, "Vente_Dimanche": 10,
-            "Ventes_J": 0, "Casse_J": 0, "Livre_Ce_Matin": 0
-        },
-        {
-            "PLU": "3003", "Produit": "Banane Cavalier", "Unite": "Kg", 
-            "Stock_Initial": 30, "PA_Brut": 0.90, "TVA": 0.055, "Marge": 30.0, "PV_Net": 1.36,
-            "Colisage": 18, "Stock_Securite": 15, "Vente_Semaine": 25, "Vente_Samedi": 50, "Vente_Dimanche": 0,
-            "Ventes_J": 0, "Casse_J": 0, "Livre_Ce_Matin": 0
-        }
-    ]).set_index("PLU")
+    st.session_state.catalogue_fl = pd.read_csv("cadencier.csv", sep=";", dtype={"PLU": str}).set_index("PLU")
+
 
 df = st.session_state.catalogue_fl
 
