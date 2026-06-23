@@ -8,25 +8,52 @@ st.set_page_config(page_title="ITM - Assistant FL Pro", page_icon="🍏", layout
 # --- INITIALISATION INTELLIGENTE DU CATALOGUE ---
 if 'catalogue_fl' not in st.session_state:
     try:
-        # 1. On tente d'abord de lire avec le point-virgule classique
-        df_temp = pd.read_csv("cadencier.csv", sep=";", dtype={"PLU": str})
+       # 1. On lit le fichier brut en texte pour ne rien perdre
+        df_temp = pd.read_csv("cadencier.csv", sep=";", dtype=str)
         
-        # 2. Si "PLU" n'est pas dedans, c'est qu'Excel a utilisé des virgules
-        if "PLU" not in df_temp.columns:
-            df_temp = pd.read_csv("cadencier.csv", sep=",", dtype={"PLU": str})
+        # Si jamais Excel a utilisé des virgules, on bascule dessus
+        if "PLU" not in df_temp.columns and "PLU " not in df_temp.columns:
+            df_temp = pd.read_csv("cadencier.csv", sep=",", dtype=str)
         
-        # 3. Sécurité : On nettoie les espaces invisibles dans les titres (ex: "PLU " devient "PLU")
-        df_temp.columns = df_temp.columns.str.strip()
+        # 2. NETTOYAGE : On enlève les espaces (comme dans "PLU ") et on met tout en MAJUSCULES
+        df_temp.columns = df_temp.columns.str.strip().str.upper()
         
-        # 4. On applique l'indexation proprement
-        st.session_state.catalogue_fl = df_temp.set_index("PLU")
+        # On définit le PLU nettoyé comme index
+        df_temp = df_temp.set_index("PLU")
+        
+        # 3. TRADUCTION : On renomme tes colonnes majuscules vers le format attendu par le code
+        mapping_colonnes = {
+            "PRODUIT": "Produit",
+            "UNITE": "Unite",
+            "STOCK_INITIAL": "Stock_Initial",
+            "PA_BRUT": "PA_Brut",
+            "TVA": "TVA",
+            "MARGE": "Marge",
+            "PV_NET": "PV_Net",
+            "COLISAGE": "Colisage",
+            "STOCK_SECURITE": "Stock_Securite",
+            "VENTE_SEMAINE": "Vente_Semaine",
+            "VENTE_SAMEDI": "Vente_Samedi",
+            "VENTE_DIMANCHE": "Vente_Dimanche",
+            "VENTE_J": "Ventes_J",   # Corrige le "S" manquant
+            "VENTES_J": "Ventes_J",
+            "CASSE_J": "Casse_J",
+            "LIVRE_CE_MATIN": "Livre_Ce_Matin"
+        }
+        df_temp = df_temp.rename(columns=mapping_colonnes)
+        
+        # 4. CONVERSION : On transforme les textes en vrais chiffres et on gère les virgules françaises (ex: 1,80 -> 1.80)
+        num_cols = ["Stock_Initial", "PA_Brut", "TVA", "Marge", "PV_Net", "Colisage", "Stock_Securite", "Vente_Semaine", "Vente_Samedi", "Vente_Dimanche", "Ventes_J", "Casse_J", "Livre_Ce_Matin"]
+        for col in num_cols:
+            if col in df_temp.columns:
+                df_temp[col] = df_temp[col].astype(str).str.replace(",", ".")
+                df_temp[col] = pd.to_numeric(df_temp[col], errors='coerce').fillna(0)
+        
+        # On stocke le résultat propre dans l'application
+        st.session_state.catalogue_fl = df_temp
         
     except Exception as e:
-        # Si un autre problème persiste, l'appli t'affiche la liste de tes colonnes réelles
-        st.error(f"⚠️ Problème de lecture du cadencier : {e}")
-        df_bug = pd.read_csv("cadencier.csv")
-        st.write("Voici les colonnes que l'application détecte actuellement dans ton fichier :")
-        st.write(df_bug.columns.tolist())
+       st.error(f"⚠️ Erreur lors du chargement du cadencier : {e}")
         st.stop()
 
 df = st.session_state.catalogue_fl
