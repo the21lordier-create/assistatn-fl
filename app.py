@@ -59,8 +59,8 @@ with tabs[1]:
         with st.expander(f"⚙️ {df.loc[plu, 'Produit']} (PLU: {plu})"):
             df.loc[plu, "Livre_Ce_Matin"] = st.number_input("Reçu ce matin (BL)", min_value=0, value=int(df.loc[plu, "Livre_Ce_Matin"]), key=f"l_{plu}")
             df.loc[plu, "Ventes_J"] = st.number_input("Ventes estimées du jour", min_value=0, value=int(df.loc[plu, "Ventes_J"]), key=f"v_{plu}")
-            df.loc[plu, "Casse_J"] = st.number_input("Casse constatée (Feuille de démarque)", min_value=0, value=int(df.loc[plu, "Casse_J"]), key=f"c_{l}")
-
+            # ICI : Correction du 'l' par 'plu' à la fin de la ligne
+            df.loc[plu, "Casse_J"] = st.number_input("Casse constatée (Feuille de démarque)", min_value=0, value=int(df.loc[plu, "Casse_J"]), key=f"c_{plu}")
 # --- TAB 3 : LE RAYON ---
 with tabs[2]:
     st.header("📦 État du Rayon & Marges")
