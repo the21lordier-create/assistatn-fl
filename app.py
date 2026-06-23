@@ -7,8 +7,23 @@ st.set_page_config(page_title="ITM - Assistant FL Pro", page_icon="🍏", layout
 
 # --- INITIALISATION DU CATALOGUE PRODUIT ---
 if 'catalogue_fl' not in st.session_state:
-    st.session_state.catalogue_fl = pd.read_csv("cadencier.csv", sep=";", dtype={"PLU": str}).set_index("PLU")
-
+    try:
+        # 1. On tente d'abord de lire avec le point-virgule classique
+df_temp = pd.read_csv("cadencier.csv", sep=";", dtype={"PLU": str})
+# 2. Si "PLU" n'est pas dedans, c'est qu'Excel a utilisé des virgules
+        if "PLU" not in df_temp.columns:
+            df_temp = pd.read_csv("cadencier.csv", sep=",", dtype={"PLU": str})
+            # 3. Sécurité : On nettoie les espaces invisibles dans les titres (ex: "PLU " devient "PLU")
+        df_temp.columns = df_temp.columns.str.strip()
+# 4. On applique l'indexation proprement
+        st.session_state.catalogue_fl = df_temp.set_index("PLU")
+except Exception as e:
+        # Si un autre problème persiste, l'appli t'affiche gentiment la liste de tes colonnes réelles
+        st.error(f"⚠️ Problème de lecture du cadencier : {e}")
+        df_bug = pd.read_csv("cadencier.csv")
+        st.write("Voici les colonnes que l'application détecte actuellement dans ton fichier :")
+        st.variant(df_bug.columns.tolist())
+        st.stop()
 
 df = st.session_state.catalogue_fl
 
