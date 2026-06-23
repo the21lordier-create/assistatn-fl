@@ -1,0 +1,6 @@
+[theme]
+primaryColor = "#D4161C"          # Rouge Mousquetaire pour les boutons et validations
+backgroundColor = "#F8F9FA"       # Fond clair anti-reflets pour le rayon
+secondaryBackgroundColor = "#FFFFFF" # Blanc pur pour isoler les fiches produits
+textColor = "#1A1A1A"             # Texte sombre pour une lisibilité maximale
+font = "sans serif"               # Police moderne lisible rapidement
